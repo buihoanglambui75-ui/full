@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Hộp quà sinh nhật</title>
+<style>
+:root{box-sizing:border-box}
+*{box-sizing:inherit}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{
+  display:flex;justify-content:center;align-items:center;
+  background:radial-gradient(circle at center,#211a3b 0%,#111 55%,#080808 100%);
+  font-family:Arial,sans-serif;
+}
+.credit{position:fixed;top:12px;left:15px;color:#888;font-size:12px;opacity:.8;z-index:1000}
+
+/* ===== GIFT BOX ===== */
+.gift-container{
+  position:relative;width:300px;height:350px;
+  display:flex;justify-content:center;align-items:center;
+  cursor:pointer;transform:translateY(80px);
+  transition:transform 1.5s cubic-bezier(.22,.61,.36,1);
+}
+.gift-container.move-right{transform:translate(calc(50vw - 200px),80px)}
+.glow{
+  position:absolute;bottom:30px;width:230px;height:45px;
+  background:#8e6cff;border-radius:50%;filter:blur(25px);opacity:.35;
+  transition:background 1s ease,opacity .5s ease,transform .5s ease;
+}
+.gift-container:hover .glow{opacity:.65;transform:scale(1.15)}
+.gift-container.open .glow{opacity:.9;transform:scale(1.3)}
+.light{
+  position:absolute;left:100px;bottom:145px;width:100px;height:80px;
+  background:#ffd86b;border-radius:50%;filter:blur(25px);opacity:0;transition:.5s;
+}
+.gift-container.open .light{opacity:1;animation:lightPulse 1s infinite alternate}
+@keyframes lightPulse{from{transform:scale(.8);opacity:.6}to{transform:scale(1.3);opacity:1}}
+
+/* ===== MESSAGE TEXT ===== */
+.message{
+  position:absolute;left:50%;bottom:125px;white-space:nowrap;
+  color:#ffd86b;font-size:25px;font-weight:bold;
+  text-shadow:0 0 5px #ffd86b,0 0 15px #ff9f00,0 0 30px #ff7b00;
+  opacity:0;pointer-events:none;
+}
+.message.show{animation:messageFly 6.5s cubic-bezier(.17,.67,.24,1.2) forwards}
+@keyframes messageFly{
+  0%{opacity:0;transform:translate(-50%,20px) scale(.25) rotate(-8deg)}
+  14%{opacity:1;transform:translate(-50%,5px) scale(.27) rotate(3deg)}
+  29%{transform:translate(-50%,-55px) scale(.29) rotate(-3deg)}
+  44%{transform:translate(-50%,-115px) scale(.32) rotate(2deg)}
+  52%{transform:translate(-50%,-145px) scale(.65) rotate(-2deg)}
+  60%{transform:translate(-50%,-190px) scale(1.15) rotate(1deg)}
+  65%{transform:translate(-50%,-205px) scale(1.15) rotate(0)}
+  88%{transform:translate(-50%,-205px) scale(1.15)}
+  100%{opacity:0;transform:translate(-50%,-215px) scale(1.1)}
+}
+.message.short{animation:shortMessage 3.3s cubic-bezier(.17,.67,.24,1.2) forwards}
+@keyframes shortMessage{
+  0%{opacity:0;transform:translate(-50%,20px) scale(.25) rotate(-5deg)}
+  21%{opacity:1;transform:translate(-50%,-80px) scale(.45) rotate(3deg)}
+  37%{transform:translate(-50%,-150px) scale(1.15) rotate(-2deg)}
+  83%{transform:translate(-50%,-205px) scale(1.15) rotate(0)}
+  100%{opacity:0;transform:translate(-50%,-215px) scale(1.1)}
+}
+.message.birthday-message{
+  color:#ffd84d;font-size:28px;
+  text-shadow:0 0 5px #fff4a3,0 0 15px #ffd84d,0 0 30px #ff9f00;
+  animation:birthdayMessage 4.9s cubic-bezier(.17,.67,.24,1.2) forwards;
+}
+@keyframes birthdayMessage{
+  0%{opacity:0;transform:translate(-50%,30px) scale(.3) rotate(-8deg)}
+  23%{opacity:1;transform:translate(-50%,-100px) scale(.6) rotate(4deg)}
+  41%{transform:translate(-50%,-205px) scale(1.2) rotate(-2deg)}
+  72%{transform:translate(-50%,-205px) scale(1.15) rotate(0)}
+  100%{opacity:0;transform:translate(-50%,-220px) scale(1.1) rotate(2deg)}
+}
+
+/* ===== BOX BODY ===== */
+.gift{position:relative;width:170px;height:140px;transform-style:preserve-3d;z-index:5}
+.gift-container:not(.open):hover .gift{transform:translateY(-5px) scale(1.04);transition:transform .4s ease}
+.box{
+  position:absolute;bottom:20px;left:10px;width:150px;height:110px;
+  background:linear-gradient(135deg,#8064ff,#5638c9);border-radius:5px;
+  box-shadow:inset 0 0 20px rgba(255,255,255,.15),0 15px 30px rgba(0,0,0,.5);
+  transition:background 1s ease;
+}
+.ribbon-vertical{position:absolute;left:65px;bottom:20px;width:40px;height:110px;background:linear-gradient(90deg,#ff4f9a,#ff75b0,#ff4f9a);z-index:2}
+.ribbon-horizontal{position:absolute;left:10px;bottom:75px;width:150px;height:30px;background:linear-gradient(180deg,#ff75b0,#ff3f91);z-index:4}
+.lid{
+  position:absolute;left:0;bottom:115px;width:170px;height:38px;
+  background:linear-gradient(135deg,#9b83ff,#684de0);border-radius:6px;
+  z-index:10;transform-origin:bottom center;
+}
+.ribbon-lid{position:absolute;left:65px;top:0;width:40px;height:38px;background:#ff5ba3}
+.bow{position:absolute;top:-35px;left:52px;width:65px;height:40px;z-index:12}
+.bow-left,.bow-right{
+  position:absolute;width:45px;height:30px;
+  background:linear-gradient(135deg,#ff72b2,#ff318d);border-radius:50% 50% 10% 50%;
+}
+.bow-left{left:-12px;transform:rotate(25deg)}
+.bow-right{right:-12px;transform:rotate(-25deg)}
+.bow-center{position:absolute;left:23px;top:8px;width:22px;height:22px;background:#ff3d91;border-radius:50%;box-shadow:0 0 10px #ff4f9a}
+.gift-container.open .lid,.gift-container.open .bow{animation:flyAway 3.8s cubic-bezier(.25,.46,.45,.94) forwards}
+@keyframes flyAway{
+  0%{opacity:1;transform:translateY(0) rotate(0)}
+  15%{transform:translateY(-95px) rotate(-10deg)}
+  30%{transform:translateY(-125px) rotate(-16deg)}
+  50%{opacity:.9;transform:translateY(-60px) rotate(8deg)}
+  70%{opacity:.65;transform:translateY(60px) rotate(20deg)}
+  85%{opacity:.3;transform:translateY(160px) rotate(35deg)}
+  100%{opacity:0;transform:translateY(300px) rotate(55deg)}
+}
+.gift-container.shake .gift{animation:giftShake .6s ease}
+@keyframes giftShake{
+  0%{transform:scale(1)}
+  30%{transform:scale(1.08) rotate(-2deg)}
+  60%{transform:scale(1.05) rotate(2deg)}
+  100%{transform:scale(1)}
+}
+.text{position:absolute;bottom:0;color:#ddd;font-size:14px;opacity:.7;white-space:nowrap;z-index:20}
+.gift-container:not(.open):hover .text{color:#fff;opacity:1}
+
+/* ===== BIRTHDAY COLOR THEME ===== */
+.gift-container.birthday .box{
+  background:linear-gradient(135deg,#ff6b9a,#ff3d68);
+  box-shadow:inset 0 0 20px rgba(255,255,255,.2),0 15px 30px rgba(255,70,100,.35);
+}
+.gift-container.birthday .ribbon-vertical{background:linear-gradient(90deg,#ffd84d,#fff09a,#ffd84d)}
+.gift-container.birthday .ribbon-horizontal{background:linear-gradient(180deg,#ffd84d,#ffbd22)}
+.gift-container.birthday .lid{background:linear-gradient(135deg,#ff8fb1,#ff4774)}
+.gift-container.birthday .ribbon-lid{background:#ffd84d}
+.gift-container.birthday .bow-left,.gift-container.birthday .bow-right{background:linear-gradient(135deg,#ffd84d,#ffb300)}
+.gift-container.birthday .bow-center{background:#ffb300;box-shadow:0 0 15px #ffd84d}
+.gift-container.birthday .glow{background:#ff5c8a;opacity:.55}
+
+/* ===== CAKE ===== */
+.cake-container{
+  position:fixed;left:3vw;top:var(--cake-top,100vh);width:400px;height:430px;
+  z-index:50;pointer-events:none;opacity:0;
+  transform:translateY(500px) scale(.75) rotate(-6deg);transform-origin:center bottom;
+}
+.cake-container.show{animation:cakeFlyIn 2.2s cubic-bezier(.22,.61,.36,1) forwards}
+.cake-container.settled{animation:none !important;opacity:1 !important;transform:translateY(0) scale(1) rotate(0) !important}
+.cake-container.settled .cake-glow{animation:none;opacity:.6}
+@keyframes cakeFlyIn{
+  0%{opacity:0;transform:translateY(500px) scale(.75) rotate(-6deg)}
+  20%{opacity:1;transform:translateY(250px) scale(.88) rotate(4deg)}
+  55%{transform:translateY(80px) scale(.98) rotate(-3deg)}
+  78%{transform:translateY(-15px) scale(1.02) rotate(2deg)}
+  100%{transform:translateY(0) scale(1) rotate(0)}
+}
+.cake{position:absolute;left:35px;bottom:20px;width:320px;height:290px}
+.cake-glow{
+  position:absolute;left:15px;bottom:20px;width:290px;height:190px;
+  background:radial-gradient(ellipse,rgba(255,100,180,.5),transparent 70%);
+  filter:blur(35px);z-index:-1;animation:cakeGlow 1.5s infinite alternate;
+}
+@keyframes cakeGlow{from{transform:scale(.9);opacity:.4}to{transform:scale(1.1);opacity:.8}}
+.cake-plate{
+  position:absolute;left:5px;bottom:0;width:310px;height:28px;
+  background:linear-gradient(180deg,#fff,#ffd3e7);border-radius:50%;
+  box-shadow:0 12px 25px rgba(0,0,0,.45),inset 0 2px 5px rgba(255,255,255,.8);
+}
+.cake-bottom{position:absolute;left:25px;bottom:20px;width:270px;height:78px;background:linear-gradient(180deg,#ff9fc9,#ff4f94);border-radius:18px 18px 25px 25px;box-shadow:inset 0 -12px 0 rgba(200,30,100,.18),0 10px 18px rgba(0,0,0,.3)}
+.cake-middle{position:absolute;left:52px;bottom:86px;width:216px;height:65px;background:linear-gradient(180deg,#ffe2ef,#ff91bc);border-radius:16px 16px 23px 23px;box-shadow:0 6px 15px rgba(0,0,0,.2)}
+.cake-top{position:absolute;left:82px;bottom:143px;width:156px;height:58px;background:linear-gradient(180deg,#fff8fc,#ffc1dc);border-radius:17px 17px 23px 23px;box-shadow:0 6px 12px rgba(0,0,0,.2)}
+.cream{position:absolute;background:linear-gradient(180deg,#fffaff,#ffe6f2);border-radius:0 0 18px 18px;z-index:3;box-shadow:0 3px 6px rgba(255,150,200,.25)}
+.cream.one{left:27px;bottom:75px;width:266px;height:22px}
+.cream.two{left:54px;bottom:138px;width:212px;height:20px}
+.cream.three{left:84px;bottom:195px;width:152px;height:18px}
+.cherry{position:absolute;width:19px;height:19px;background:radial-gradient(circle at 30% 25%,#ffb0c8,#ff315f 45%,#c9003d 100%);border-radius:50%;box-shadow:0 3px 7px rgba(150,0,50,.4);z-index:6}
+.cherry.one{left:60px;bottom:69px}
+.cherry.two{left:230px;bottom:70px}
+.cherry.three{left:130px;bottom:130px}
+.leaf{position:absolute;width:13px;height:7px;background:#55c96f;border-radius:100% 0 100% 0;z-index:7}
+.leaf.one{left:58px;bottom:87px;transform:rotate(-25deg)}
+.leaf.two{left:231px;bottom:88px;transform:rotate(25deg)}
+.leaf.three{left:128px;bottom:148px;transform:rotate(-15deg)}
+.sprinkle{position:absolute;width:10px;height:4px;border-radius:5px;z-index:7}
+.sprinkle.s1{left:95px;bottom:108px;background:#ffd84d;transform:rotate(20deg)}
+.sprinkle.s2{left:160px;bottom:108px;background:#65e6ff;transform:rotate(-20deg)}
+.sprinkle.s3{left:190px;bottom:108px;background:#a878ff;transform:rotate(15deg)}
+.sprinkle.s4{left:110px;bottom:47px;background:#fff;transform:rotate(-15deg)}
+.sprinkle.s5{left:175px;bottom:48px;background:#ffd84d;transform:rotate(25deg)}
+.candle{position:absolute;left:152px;bottom:199px;width:20px;height:68px;border-radius:6px;background:repeating-linear-gradient(135deg,#7d6cff 0,#7d6cff 7px,#fff 7px,#fff 13px);box-shadow:0 0 12px rgba(130,110,255,.6);z-index:8}
+.wick{position:absolute;left:160px;bottom:264px;width:4px;height:9px;background:#292929;border-radius:3px;z-index:9}
+.flame{
+  position:absolute;left:148px;bottom:268px;width:28px;height:42px;
+  background:radial-gradient(ellipse at center bottom,#fff 0%,#fff06a 30%,#ffae00 55%,#ff5a00 75%,transparent 76%);
+  border-radius:50% 50% 45% 45%;filter:drop-shadow(0 0 12px #ffd84d);
+  transform-origin:center bottom;z-index:10;animation:flameFlicker .45s infinite alternate;
+}
+@keyframes flameFlicker{from{transform:scale(.9) rotate(-4deg)}to{transform:scale(1.15) rotate(4deg)}}
+
+/* ===== CONFETTI ===== */
+.rain-confetti{position:fixed;top:-30px;width:9px;height:16px;opacity:0;pointer-events:none;z-index:900}
+.rain-confetti.falling{animation:fall linear forwards}
+@keyframes fall{
+  0%{transform:translateY(-30px) rotate(0deg);opacity:1}
+  100%{transform:translateY(110vh) rotate(720deg);opacity:0}
+}
+@media (max-width:800px){
+  .gift-container.move-right{transform:translate(calc(50vw - 150px),80px) scale(.85)}
+  .cake-container{left:-55px;transform-origin:center bottom}
+}
+
+/* ===== BIRTHDAY DATE GATE ===== */
+.birthday-check{
+  position:fixed;inset:0;z-index:2000;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at center,#211a3b 0%,#111 55%,#080808 100%);
+  transition:opacity .6s ease,visibility .6s ease;
+}
+.birthday-check.hide{opacity:0;visibility:hidden;pointer-events:none}
+.check-card{
+  position:relative;text-align:center;color:#eee;
+  background:rgba(255,255,255,.05);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.12);border-radius:18px;
+  padding:34px 38px;box-shadow:0 20px 40px rgba(0,0,0,.4);
+}
+.check-label{margin:0 0 16px;font-size:16px;color:#ddd}
+.check-input{padding:9px 12px;border-radius:8px;font-size:15px;margin-right:10px;background:#1c1730;color:#fff;border:1px solid #4b3f8a;color-scheme:dark}
+.check-btn{
+  padding:9px 20px;border:none;border-radius:8px;font-size:15px;font-weight:bold;
+  color:#fff;cursor:pointer;background:linear-gradient(135deg,#8064ff,#5638c9);
+  box-shadow:0 6px 16px rgba(100,70,220,.4);transition:filter .2s ease,transform .2s ease;
+}
+.check-btn:hover{filter:brightness(1.15);transform:translateY(-1px)}
+.chat-bubble{
+  position:absolute;top:-56px;left:50%;transform:translateX(-50%) scale(.6);
+  background:#fff;color:#3a2f5c;padding:10px 18px;border-radius:14px;
+  font-size:14px;font-weight:bold;white-space:nowrap;opacity:0;pointer-events:none;
+  box-shadow:0 8px 18px rgba(0,0,0,.35);transition:opacity .25s ease;
+}
+.chat-bubble::after{
+  content:"";position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);
+  border-width:8px 8px 0;border-style:solid;border-color:#fff transparent transparent;
+}
+.chat-bubble.show{opacity:1;animation:bubblePop .35s ease}
+@keyframes bubblePop{
+  0%{transform:translateX(-50%) scale(.5) rotate(-4deg)}
+  60%{transform:translateX(-50%) scale(1.08) rotate(2deg)}
+  100%{transform:translateX(-50%) scale(1) rotate(0)}
+}
+
+/* ===== BẢNG "KHÁM PHÁ VŨ TRỤ" (xuất hiện giữa hộp quà và bánh kem) ===== */
+.universe-card{
+  position:fixed;left:50%;top:50%;z-index:1000;
+  transform:translate(-50%,-50%) scale(.6);
+  opacity:0;visibility:hidden;
+  background:rgba(25,0,30,.65);border:1px solid rgba(255,0,102,.5);
+  backdrop-filter:blur(15px);padding:34px 28px;border-radius:24px;text-align:center;
+  box-shadow:0 0 50px rgba(230,0,90,.4);width:260px;color:#fff;
+  transition:opacity .7s ease,transform .7s cubic-bezier(.22,.61,.36,1.3),visibility .7s ease;
+}
+.universe-card.show{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1)}
+.universe-card h1{font-size:1.4rem;margin:0 0 10px;text-shadow:0 0 15px #ff0066}
+.universe-card p{font-size:.9rem;color:#ddd;margin:0 0 22px}
+.btn-enter{
+  background:linear-gradient(90deg,#ff0066,#9900aa);border:none;color:#fff;
+  padding:12px 26px;font-size:.9rem;font-weight:bold;border-radius:30px;cursor:pointer;
+  box-shadow:0 0 25px rgba(255,0,102,.7);transition:transform .2s;
+}
+.btn-enter:hover{transform:scale(1.06)}
+@media (max-width:800px){.universe-card{top:16%;width:230px;padding:24px 20px}}
+
+/* ===== GALAXY STAGE ===== */
+#galaxy-stage{
+  position:fixed;inset:0;z-index:1500;background:#010003;color:#fff;
+  opacity:0;visibility:hidden;transition:opacity 1.2s ease,visibility 1.2s ease;
+}
+#galaxy-stage.active{opacity:1;visibility:visible}
+#canvas-container{width:100%;height:100%}
+#control-panel{
+  position:absolute;top:20px;right:20px;z-index:100;
+  background:rgba(20,0,25,.75);border:1px solid rgba(255,0,102,.4);
+  backdrop-filter:blur(12px);padding:15px 20px;border-radius:16px;
+  box-shadow:0 0 25px rgba(255,0,102,.25);width:240px;
+}
+.control-group{margin-bottom:12px}
+.control-group:last-child{margin-bottom:0}
+.control-group label{display:block;font-size:.8rem;color:#ff88cc;margin-bottom:5px;font-weight:bold}
+.control-group input[type="color"]{width:100%;height:32px;border:none;border-radius:6px;cursor:pointer;background:transparent}
+.control-group input[type="range"]{width:100%;cursor:pointer;accent-color:#ff0066}
+@media (max-width:800px){#control-panel{width:180px;padding:10px 12px;top:12px;right:12px}}
+
+#wish-modal{
+  position:absolute;inset:0;z-index:1000;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);
+  display:flex;justify-content:center;align-items:center;
+  opacity:0;visibility:hidden;transition:opacity .4s ease,visibility .4s ease;
+}
+#wish-modal.active{opacity:1;visibility:visible}
+.wish-card{
+  background:rgba(30,5,38,.95);border:2px solid #ff0066;padding:30px 25px;border-radius:24px;
+  text-align:center;max-width:360px;width:85%;box-shadow:0 0 50px rgba(255,0,102,.6);
+  position:relative;transform:scale(.8);transition:transform .4s ease;
+}
+#wish-modal.active .wish-card{transform:scale(1)}
+.wish-img{width:120px;height:120px;border-radius:50%;border:3px solid #ff3399;box-shadow:0 0 25px #ff0066;object-fit:cover;margin-bottom:15px}
+.wish-title{color:#ff3399;font-size:1.35rem;margin:0 0 12px;text-shadow:0 0 12px #ff0066}
+.wish-text{font-size:.95rem;line-height:1.6;color:#f0f0f0;margin:0 0 22px}
+.close-btn{position:absolute;top:12px;right:18px;background:none;border:none;color:#aaa;font-size:1.8rem;cursor:pointer}
+.close-btn:hover{color:#fff}
+
+/* ===== HỐ ĐEN (xuất hiện sau khi xem đủ 4 lời chúc) ===== */
+#blackhole{
+  position:absolute;right:20px;top:300px;z-index:100;width:56px;height:56px;
+  cursor:pointer;opacity:0;visibility:hidden;transform:scale(.2);
+  transition:opacity .8s ease,transform .8s cubic-bezier(.22,.61,.36,1.4),visibility .8s ease;
+}
+#blackhole.show{opacity:1;visibility:visible;transform:scale(1)}
+#blackhole:hover{filter:brightness(1.3)}
+#blackhole .bh-ring{
+  position:absolute;inset:0;border-radius:50%;
+  background:conic-gradient(from 0deg,#ff0066,#ffb347,#9900aa,#ff0066);
+  filter:blur(1.5px);animation:bhSpin 3s linear infinite;
+  -webkit-mask:radial-gradient(circle,transparent 38%,#000 42%,#000 70%,transparent 72%);
+  mask:radial-gradient(circle,transparent 38%,#000 42%,#000 70%,transparent 72%);
+  box-shadow:0 0 22px rgba(255,0,102,.8);
+}
+#blackhole .bh-core{position:absolute;inset:16px;border-radius:50%;background:#000;box-shadow:0 0 12px 4px rgba(0,0,0,.9),inset 0 0 6px #33004d}
+@keyframes bhSpin{to{transform:rotate(360deg)}}
+#blackhole .bh-tip{position:absolute;right:64px;top:18px;white-space:nowrap;font-size:.75rem;color:#ff88cc;opacity:0;transition:opacity .3s;pointer-events:none}
+#blackhole:hover .bh-tip{opacity:1}
+
+.pw-modal{
+  position:absolute;inset:0;z-index:1200;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);
+  display:flex;justify-content:center;align-items:center;
+  opacity:0;visibility:hidden;transition:opacity .4s ease,visibility .4s ease;
+}
+.pw-modal.active{opacity:1;visibility:visible}
+.pw-card{
+  background:rgba(20,0,25,.95);border:2px solid #9900aa;padding:30px 26px;border-radius:24px;
+  text-align:center;max-width:340px;width:85%;box-shadow:0 0 50px rgba(153,0,170,.6);position:relative;
+}
+.pw-card h2{margin:0 0 6px;color:#ff88cc;font-size:1.2rem}
+.pw-card p{margin:0 0 16px;font-size:.85rem;color:#ccc}
+.pw-input{
+  width:100%;padding:11px 14px;border-radius:10px;border:1px solid #9900aa;background:#12001a;color:#fff;
+  font-size:1.2rem;text-align:center;letter-spacing:.4em;outline:none;margin-bottom:10px;
+}
+.pw-input:focus{border-color:#ff0066;box-shadow:0 0 12px rgba(255,0,102,.5)}
+.pw-error{min-height:1.2em;font-size:.8rem;color:#ff5577;margin-bottom:12px}
+.pw-card.shake{animation:pwShake .4s ease}
+@keyframes pwShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.credit-card h2{font-size:1.5rem;color:#ff3399;text-shadow:0 0 12px #ff0066;margin:0 0 10px}
+.credit-name{font-size:1.3rem;font-weight:bold;color:#fff;text-shadow:0 0 12px #ff0066,0 0 25px #9900aa;margin:8px 0 14px}
+.credit-stats{margin:0 0 20px;font-size:.95rem;line-height:1.9;color:#ffd6ec}
+@media (max-width:800px){#blackhole{right:12px}}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+
+<div class="credit">Nguoi Thuc Vat</div>
+
+<!-- ===== BIRTHDAY DATE GATE ===== -->
+<div class="birthday-check" id="birthdayCheck">
+  <div class="check-card">
+    <div class="chat-bubble" id="chatBubble"></div>
+    <p class="check-label">🎂 Nhập ngày sinh của bạn:</p>
+    <input type="date" id="birthdayInput" class="check-input" onkeydown="if(event.key==='Enter') checkBirthday()">
+    <button class="check-btn" onclick="checkBirthday()">Xác nhận</button>
+  </div>
+</div>
+
+<!-- ===== HỘP QUÀ ===== -->
+<div class="gift-container" id="gift" onclick="handleGiftClick()">
+  <div class="glow"></div>
+  <div class="light"></div>
+  <div class="message" id="message">😄 Không có gì =))</div>
+  <div class="gift">
+    <div class="box"></div>
+    <div class="ribbon-vertical"></div>
+    <div class="ribbon-horizontal"></div>
+    <div class="lid"><div class="ribbon-lid"></div></div>
+    <div class="bow">
+      <div class="bow-left"></div>
+      <div class="bow-right"></div>
+      <div class="bow-center"></div>
+    </div>
+  </div>
+  <div class="text" id="text">🎁 Bấm vào hộp quà</div>
+</div>
+
+<!-- ===== BÁNH KEM ===== -->
+<div class="cake-container" id="cake">
+  <div class="cake">
+    <div class="cake-glow"></div>
+    <div class="cake-plate"></div>
+    <div class="cake-bottom"></div>
+    <div class="cake-middle"></div>
+    <div class="cake-top"></div>
+    <div class="cream one"></div>
+    <div class="cream two"></div>
+    <div class="cream three"></div>
+    <div class="cherry one"></div>
+    <div class="cherry two"></div>
+    <div class="cherry three"></div>
+    <div class="leaf one"></div>
+    <div class="leaf two"></div>
+    <div class="leaf three"></div>
+    <div class="sprinkle s1"></div>
+    <div class="sprinkle s2"></div>
+    <div class="sprinkle s3"></div>
+    <div class="sprinkle s4"></div>
+    <div class="sprinkle s5"></div>
+    <div class="candle"></div>
+    <div class="wick"></div>
+    <div class="flame"></div>
+  </div>
+</div>
+
+<!-- ===== BẢNG KHÁM PHÁ VŨ TRỤ (giữa hộp quà và bánh kem) ===== -->
+<div class="universe-card" id="universeCard">
+  <h1>HAPPY BIRTHDAY</h1>
+  <p>Còn một món quà nữa đang chờ cậu ❤️</p>
+  <button class="btn-enter" onclick="startExperience()">KHÁM PHÁ VŨ TRỤ ✨</button>
+</div>
+
+<!-- ===== VŨ TRỤ ===== -->
+<div id="galaxy-stage">
+  <div id="canvas-container"></div>
+
+  <div id="control-panel">
+    <div class="control-group">
+      <label>Màu Hoa Anh Đào</label>
+      <input type="color" id="heartColorPicker" value="#ffb3d1" oninput="updateHeartColor(this.value)">
+    </div>
+    <div class="control-group">
+      <label>Màu Trái Tim Bay Lên</label>
+      <input type="color" id="floatingColorPicker" value="#ff0066" oninput="updateFloatingColor(this.value)">
+    </div>
+    <div class="control-group">
+      <label>Độ Sáng / Tương Phản</label>
+      <input type="range" id="contrastSlider" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateContrast(this.value)">
+    </div>
+  </div>
+
+  <div id="wish-modal">
+    <div class="wish-card">
+      <button class="close-btn" onclick="closeWishModal()">&times;</button>
+      <img id="modal-img" src="" class="wish-img" alt="Avatar">
+      <h2 id="modal-title" class="wish-title">HAPPY BIRTHDAY! ❤️</h2>
+      <p id="modal-text" class="wish-text"></p>
+      <button class="btn-enter" onclick="closeWishModal()">Cảm ơn ❤️</button>
+    </div>
+  </div>
+
+  <!-- Hố đen nhỏ dưới bảng điều chỉnh màu -->
+  <div id="blackhole" onclick="openPasswordModal()" title="Hố đen bí ẩn">
+    <div class="bh-ring"></div>
+    <div class="bh-core"></div>
+    <div class="bh-tip">Bí mật...</div>
+  </div>
+
+  <!-- Nhập mật khẩu -->
+  <div class="pw-modal" id="pw-modal">
+    <div class="pw-card" id="pw-card">
+      <button class="close-btn" onclick="closePasswordModal()">&times;</button>
+      <h2>🕳️ Hố đen bí ẩn</h2>
+      <p>Nhập mật khẩu để tiếp tục</p>
+      <input type="password" id="pw-input" class="pw-input" maxlength="8" inputmode="numeric" autocomplete="off"
+             onkeydown="if(event.key==='Enter') checkPassword()">
+      <div class="pw-error" id="pw-error"></div>
+      <button class="btn-enter" onclick="checkPassword()">Xác nhận</button>
+    </div>
+  </div>
+
+  <!-- Credit -->
+  <div class="pw-modal" id="credit-modal">
+    <div class="pw-card credit-card">
+      <button class="close-btn" onclick="closeCreditModal()">&times;</button>
+      <h2>✨ Credit ✨</h2>
+      <p>Món quà này được tạo bởi</p>
+      <div class="credit-name">Nguoi Thuc Vat</div>
+      <div class="credit-stats">
+        <div>⏳ completed in 3 months</div>
+        <div>💻 >1000 line code</div>
+        <div>Vẫn còn nữa mà!</div>
+        <div>https://buihoanglambui75-ui.github.io/kho_noi/</div>
+      </div>
+      <button class="btn-enter" onclick="closeCreditModal()">Đóng ❤️</button>
+    </div>
+  </div>
+</div>
+
+<audio id="bg-music" loop preload="auto">
+  <source src="https://assets.mixkit.co/music/preview/mixkit-happy-birthday-to-you-437.mp3" type="audio/mpeg">
+</audio>
+
+<!-- ============================================================ -->
+<!-- PHẦN 1: HỘP QUÀ -> BÁNH KEM -> HIỆN BẢNG KHÁM PHÁ VŨ TRỤ      -->
+<!-- ============================================================ -->
+<script>
+const gift = document.getElementById("gift");
+const text = document.getElementById("text");
+const message = document.getElementById("message");
+const cake = document.getElementById("cake");
+const universeCard = document.getElementById("universeCard");
+const birthdayCheck = document.getElementById("birthdayCheck");
+const birthdayInput = document.getElementById("birthdayInput");
+const chatBubble = document.getElementById("chatBubble");
+let bubbleTimer = null;
+
+function checkBirthday() {
+  const val = birthdayInput.value;
+  if (!val) { showBubble("Chọn ngày đi đã 😅"); return; }
+  const chosen = new Date(val + "T00:00:00");
+  const today = new Date();
+  const isToday = chosen.getDate() === today.getDate() && chosen.getMonth() === today.getMonth();
+  if (isToday) {
+    birthdayCheck.classList.add("hide");
+    setTimeout(openGift, 650);
+  } else {
+    showBubble("Không phải hôm nay òi 😅");
+  }
+}
+
+function showBubble(txt) {
+  chatBubble.textContent = txt;
+  chatBubble.classList.remove("show");
+  void chatBubble.offsetWidth;
+  chatBubble.classList.add("show");
+  clearTimeout(bubbleTimer);
+  bubbleTimer = setTimeout(() => chatBubble.classList.remove("show"), 2200);
+}
+
+let opened = false;
+let sequenceRunning = false;
+let finished = false;
+
+const teaseSteps = [
+  { text: "😄 Không có gì =))", cls: "show",  wait: 6500 },
+  { text: "😂 Đùa đấy",         cls: "short", wait: 3300 },
+  { text: "🔄 Làm lại đi",      cls: "short", wait: 3300 },
+];
+
+function setMessage(txt, cls) {
+  message.className = "message";
+  message.innerHTML = txt;
+  void message.offsetWidth;
+  if (cls) message.classList.add(cls);
+}
+
+function runTeaseStep(i) {
+  if (i >= teaseSteps.length) return finishSequence();
+  const step = teaseSteps[i];
+  if (i > 0) setMessage(step.text, step.cls);
+  setTimeout(() => runTeaseStep(i + 1), step.wait);
+}
+
+function handleGiftClick() {
+  if (finished || sequenceRunning) return;
+  if (gift.classList.contains("birthday") && !opened) showBirthdayMessage();
+  else if (!opened) openGift();
+}
+
+function openGift() {
+  gift.classList.remove("birthday");
+  setMessage(teaseSteps[0].text, "");
+  gift.classList.add("open", "shake");
+  opened = true;
+  sequenceRunning = true;
+  text.innerHTML = "🎁 Đang mở quà...";
+  setTimeout(() => message.classList.add("show"), 250);
+  createConfetti();
+  setTimeout(() => runTeaseStep(1), teaseSteps[0].wait);
+}
+
+function finishSequence() {
+  setMessage("", "");
+  gift.classList.remove("open", "shake");
+  setTimeout(() => gift.classList.add("birthday"), 700);
+  text.innerHTML = "🎂 Bấm vào hộp quà";
+  opened = false;
+  sequenceRunning = false;
+}
+
+function showBirthdayMessage() {
+  sequenceRunning = true;
+  opened = true;
+  gift.classList.add("open", "shake");
+  text.innerHTML = "🎉 Chúc mừng sinh nhật!";
+  setMessage("🎂 Sinh nhật vui vẻ! 🎉", "birthday-message");
+  createConfetti();
+
+  setTimeout(() => {
+    setMessage("", "");
+    gift.classList.remove("open", "shake");
+
+    const boxBottom = gift.querySelector(".box").getBoundingClientRect().bottom;
+    cake.style.setProperty("--cake-top", (boxBottom - 410) + "px");
+
+    gift.classList.add("move-right");
+    cake.classList.remove("show", "settled");
+    void cake.offsetWidth;
+    cake.classList.add("show");
+    cake.addEventListener("animationend", function lockCake(e) {
+      if (e.animationName === "cakeFlyIn") {
+        cake.classList.add("settled");
+        cake.removeEventListener("animationend", lockCake);
+        // Bánh kem đã xuất hiện xong -> hiện bảng "Khám phá vũ trụ" ở giữa
+        setTimeout(() => universeCard.classList.add("show"), 500);
+      }
+    });
+
+    createConfetti();
+    text.innerHTML = "🎉 Chúc mừng sinh nhật!";
+    sequenceRunning = false;
+    finished = true;
+  }, 4900);
+}
+
+function createConfetti() {
+  const colors = ["#ff4f9a","#ffd84d","#5ee7ff","#a878ff","#ff914d","#7dff82","#ffffff"];
+  for (let i = 0; i < 100; i++) {
+    const c = document.createElement("div");
+    c.className = "rain-confetti";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.width = (Math.random() * 7 + 5) + "px";
+    c.style.height = (Math.random() * 12 + 8) + "px";
+    c.style.animationDuration = (Math.random() * 3 + 2) + "s";
+    c.style.animationDelay = (Math.random() * 1.2) + "s";
+    c.style.transform = "rotate(" + Math.random() * 360 + "deg)";
+    document.body.appendChild(c);
+    requestAnimationFrame(() => c.classList.add("falling"));
+    setTimeout(() => c.remove(), 6000);
+  }
+}
+
+// Bấm nút "KHÁM PHÁ VŨ TRỤ" -> chuyển sang phần vũ trụ
+function startExperience() {
+  universeCard.classList.remove("show");
+  document.getElementById("galaxy-stage").classList.add("active");
+  initGalaxy();
+  const audio = document.getElementById("bg-music");
+  if (audio) audio.play().catch(e => console.log("Audio error:", e));
+}
+</script>
+
+<!-- ============================================================ -->
+<!-- PHẦN 2: KHÁM PHÁ VŨ TRỤ (chỉ khởi tạo khi bấm nút)             -->
+<!-- ============================================================ -->
+<script>
+const wishesData = [
+  { img: "https://i.postimg.cc/J4y3gHs7/1.jpg", title: "Lời Chúc Rực Rỡ ✨",
+    text: "Chúc cậu một tuổi mới thật rực rỡ, luôn giữ nụ cười tươi rạng rỡ và gặt hái thêm nhiều thành công mới!" },
+  { img: "https://i.postimg.cc/8zMRk8BC/2.jpg", title: "Ngọt Ngào & Hạnh Phúc 💖",
+    text: "Mong rằng mỗi ngày trong tuổi mới của cậu đều ngập tràn niềm vui, sự ngọt ngào và những ký ức tuyệt vời." },
+  { img: "https://i.postimg.cc/fbsxJHB7/3.jpg", title: "Tỏa Sáng Tinh Tú 🌟",
+    text: "Cậu luôn là ngôi sao tỏa sáng nhất. Hãy luôn tự tin, mạnh mẽ bước tiếp và theo đuổi ước mơ của mình nhé!" },
+  { img: "https://i.postimg.cc/vmv59WKd/4.jpg", title: "Tuổi Mới Bình An 🎂",
+    text: "Happy Birthday! Chúc cậu có một ngày sinh nhật thật ấm áp bên người thân yêu, luôn xinh đẹp và may mắn!" }
+];
+
+const viewedWishes = new Set();
+const SECRET_PASSWORD = "2412";
+
+function openWishModal(index) {
+  const data = wishesData[index];
+  viewedWishes.add(index);
+  document.getElementById('modal-img').src = data.img;
+  document.getElementById('modal-title').innerText = data.title;
+  document.getElementById('modal-text').innerText = data.text;
+  document.getElementById('wish-modal').classList.add('active');
+}
+function closeWishModal() {
+  document.getElementById('wish-modal').classList.remove('active');
+  // Đã xem đủ 4 lời chúc -> hiện hố đen bên dưới bảng điều chỉnh màu
+  if (viewedWishes.size >= wishesData.length) showBlackHole();
+}
+
+function showBlackHole() {
+  const bh = document.getElementById('blackhole');
+  if (bh.classList.contains('show')) return;
+  const panel = document.getElementById('control-panel');
+  bh.style.top = (panel.getBoundingClientRect().bottom + 14) + 'px';
+  setTimeout(() => bh.classList.add('show'), 300);
+}
+window.addEventListener('resize', () => {
+  const panel = document.getElementById('control-panel');
+  document.getElementById('blackhole').style.top = (panel.getBoundingClientRect().bottom + 14) + 'px';
+});
+
+function openPasswordModal() {
+  const input = document.getElementById('pw-input');
+  input.value = '';
+  document.getElementById('pw-error').textContent = '';
+  document.getElementById('pw-modal').classList.add('active');
+  setTimeout(() => input.focus(), 200);
+}
+function closePasswordModal() {
+  document.getElementById('pw-modal').classList.remove('active');
+}
+function checkPassword() {
+  const input = document.getElementById('pw-input');
+  if (input.value === SECRET_PASSWORD) {
+    closePasswordModal();
+    setTimeout(() => document.getElementById('credit-modal').classList.add('active'), 350);
+  } else {
+    const card = document.getElementById('pw-card');
+    document.getElementById('pw-error').textContent = 'Sai mật khẩu rồi 😅';
+    card.classList.remove('shake');
+    void card.offsetWidth;
+    card.classList.add('shake');
+    input.value = '';
+    input.focus();
+  }
+}
+function closeCreditModal() {
+  document.getElementById('credit-modal').classList.remove('active');
+}
+
+let galaxyReady = false;
+function initGalaxy() {
+  if (galaxyReady) return;
+  galaxyReady = true;
+
+  // 1. SCENE & CAMERA
+  const container = document.getElementById('canvas-container');
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.set(0, 3.5, 7.5);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  container.appendChild(renderer.domElement);
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.05;
+
+  const mainGroup = new THREE.Group();
+  scene.add(mainGroup);
+
+  // 2. TEXTURE HẠT NEON
+  function createGlowTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 64; canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+    gradient.addColorStop(0.3, 'rgba(255, 255, 255, 0.8)');
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 64, 64);
+    return new THREE.CanvasTexture(canvas);
+  }
+  const particleTexture = createGlowTexture();
+
+  // 3. CÂY CỔ THỤ 3D (thân + cành + tán hoa anh đào)
+  const heartPosArr = [];
+  const heartColorArr = [];
+  const leafIndexRanges = [];
+
+  function pushPoint(x, y, z, r, g, b) {
+    heartPosArr.push(x, y, z);
+    heartColorArr.push(r, g, b);
+  }
+  function trunkColor() {
+    const v = 0.75 + Math.random() * 0.3;
+    return [0.32 * v, 0.19 * v, 0.10 * v];
+  }
+
+  const TREE_BASE_Y = -1.9;
+  const trunkHeight = 3.1;
+  const trunkPoints = 4200;
+  for (let i = 0; i < trunkPoints; i++) {
+    const t = Math.random();
+    const y = TREE_BASE_Y + t * trunkHeight;
+    const radius = 0.85 * Math.pow(1 - t, 0.32) + 0.16;
+    const angle = Math.random() * Math.PI * 2;
+    const rr = radius * (0.82 + Math.random() * 0.22);
+    const [r, g, b] = trunkColor();
+    pushPoint(Math.cos(angle) * rr, y, Math.sin(angle) * rr, r, g, b);
+  }
+
+  function growBranch(origin, dir, length, baseRadius, depth) {
+    const segPoints = Math.max(30, Math.floor(length * 160));
+    const curveAxis = new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize();
+    let pos = origin.clone();
+    const step = length / segPoints;
+
+    for (let s = 0; s < segPoints; s++) {
+      const t = s / segPoints;
+      const radius = baseRadius * (1 - t) + 0.02;
+      const bend = Math.sin(t * Math.PI * 0.5) * length * 0.18;
+      const curved = dir.clone().normalize().multiplyScalar(step)
+        .add(curveAxis.clone().multiplyScalar(bend * 0.02));
+      pos = pos.clone().add(curved);
+
+      for (let k = 0; k < 2; k++) {
+        const jitterAngle = Math.random() * Math.PI * 2;
+        const jr = radius * Math.random();
+        const perp1 = new THREE.Vector3().crossVectors(dir, curveAxis).normalize();
+        const perp2 = new THREE.Vector3().crossVectors(dir, perp1).normalize();
+        const jitter = perp1.clone().multiplyScalar(Math.cos(jitterAngle) * jr)
+          .add(perp2.clone().multiplyScalar(Math.sin(jitterAngle) * jr));
+        const p = pos.clone().add(jitter);
+        const [cr, cg, cb] = trunkColor();
+        pushPoint(p.x, p.y, p.z, cr, cg, cb);
+      }
+    }
+
+    const tip = pos.clone();
+
+    if (depth < 2) {
+      for (let c = 0; c < 2; c++) {
+        const spread = 0.55 + Math.random() * 0.35;
+        const newDir = dir.clone()
+          .add(new THREE.Vector3((Math.random() - 0.5) * spread, 0.35 + Math.random() * 0.25, (Math.random() - 0.5) * spread))
+          .normalize();
+        growBranch(tip, newDir, length * (0.6 + Math.random() * 0.15), baseRadius * 0.6, depth + 1);
+      }
+    } else {
+      const leafCount = 380 + Math.floor(Math.random() * 160);
+      const leafRadius = 0.8 + Math.random() * 0.5;
+      const startIdx = heartPosArr.length / 3;
+      for (let i = 0; i < leafCount; i++) {
+        const u = Math.random(), v = Math.random();
+        const rr = leafRadius * Math.cbrt(Math.random());
+        const theta = u * Math.PI * 2;
+        const phi = Math.acos(2 * v - 1);
+        const lx = tip.x + rr * Math.sin(phi) * Math.cos(theta);
+        const ly = tip.y + rr * Math.cos(phi) * 0.7;
+        const lz = tip.z + rr * Math.sin(phi) * Math.sin(theta);
+        const petal = Math.random();
+        pushPoint(lx, ly, lz, 1.0, 0.55 + petal * 0.35, 0.72 + petal * 0.24);
+      }
+      leafIndexRanges.push([startIdx, heartPosArr.length / 3]);
+    }
+  }
+
+  const mainBranchCount = 10;
+  const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < mainBranchCount; i++) {
+    const startT = 0.66 + (i / mainBranchCount) * 0.3;
+    const startY = TREE_BASE_Y + startT * trunkHeight;
+    const angle = i * goldenAngle;
+    const startRadius = 0.85 * Math.pow(1 - startT, 0.32) + 0.16;
+    const origin = new THREE.Vector3(Math.cos(angle) * startRadius * 0.6, startY, Math.sin(angle) * startRadius * 0.6);
+    const dir = new THREE.Vector3(Math.cos(angle) * 1.3, 0.45 + Math.random() * 0.3, Math.sin(angle) * 1.3).normalize();
+    growBranch(origin, dir, 1.7 + Math.random() * 0.7, 0.22, 0);
+  }
+
+  const heartGeo = new THREE.BufferGeometry();
+  heartGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(heartPosArr), 3));
+  heartGeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(heartColorArr), 3));
+
+  const heartMat = new THREE.PointsMaterial({
+    size: 0.05, map: particleTexture, vertexColors: true,
+    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+  });
+  const heartPoints = new THREE.Points(heartGeo, heartMat);
+  mainGroup.add(heartPoints);
+
+  gsap.to(heartPoints.rotation, { z: 0.02, duration: 2.4, repeat: -1, yoyo: true, ease: "sine.inOut" });
+
+  function updateHeartColor(hex) {
+    const color = new THREE.Color(hex);
+    const colors = heartGeo.attributes.color.array;
+    for (const [start, end] of leafIndexRanges) {
+      for (let i = start; i < end; i++) {
+        const shade = 0.82 + Math.random() * 0.3;
+        colors[i * 3] = Math.min(1, color.r * shade + 0.05);
+        colors[i * 3 + 1] = Math.min(1, color.g * shade + 0.05);
+        colors[i * 3 + 2] = Math.min(1, color.b * shade + 0.05);
+      }
+    }
+    heartGeo.attributes.color.needsUpdate = true;
+  }
+
+  // 4. DẢI NGÂN HÀ 3D
+  const galaxyParams = { count: 30000, radius: 10, branches: 3, spin: 1.4 };
+  const galaxyGeo = new THREE.BufferGeometry();
+  const galaxyPos = new Float32Array(galaxyParams.count * 3);
+  const galaxyColors = new Float32Array(galaxyParams.count * 3);
+  for (let i = 0; i < galaxyParams.count; i++) {
+    const r = Math.pow(Math.random(), 2.2) * galaxyParams.radius;
+    const spinAngle = r * galaxyParams.spin;
+    const branchAngle = ((i % galaxyParams.branches) / galaxyParams.branches) * Math.PI * 2;
+    galaxyPos[i * 3] = Math.cos(branchAngle + spinAngle) * r + (Math.random() - 0.5) * 0.4;
+    galaxyPos[i * 3 + 1] = (Math.random() - 0.5) * 0.2;
+    galaxyPos[i * 3 + 2] = Math.sin(branchAngle + spinAngle) * r + (Math.random() - 0.5) * 0.4;
+    galaxyColors[i * 3] = 0.5;
+    galaxyColors[i * 3 + 1] = 0.1;
+    galaxyColors[i * 3 + 2] = 0.9;
+  }
+  galaxyGeo.setAttribute('position', new THREE.BufferAttribute(galaxyPos, 3));
+  galaxyGeo.setAttribute('color', new THREE.BufferAttribute(galaxyColors, 3));
+  const galaxyMat = new THREE.PointsMaterial({
+    size: 0.035, map: particleTexture, vertexColors: true,
+    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+  });
+  mainGroup.add(new THREE.Points(galaxyGeo, galaxyMat));
+
+  // 5. KHUNG ẢNH SPRITE
+  const photoSprites = [];
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+
+  function createCircleTexture(imgUrl, callback) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512; canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.src = imgUrl;
+    img.onload = () => {
+      ctx.clearRect(0, 0, 512, 512);
+      ctx.beginPath();
+      ctx.arc(256, 256, 240, 0, Math.PI * 2);
+      ctx.fillStyle = "#ff0066";
+      ctx.fill();
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(256, 256, 222, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(img, 0, 0, 512, 512);
+      ctx.restore();
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.needsUpdate = true;
+      callback(texture);
+    };
+  }
+
+  const photoPositions = [
+    { r: 2.3, angle: 0.8, y: 0.25 },
+    { r: 3.7, angle: 2.4, y: 0.35 },
+    { r: 4.9, angle: 4.2, y: 0.20 },
+    { r: 6.0, angle: 5.6, y: 0.40 }
+  ];
+  for (let i = 0; i < 4; i++) {
+    createCircleTexture(wishesData[i].img, (texture) => {
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true }));
+      sprite.scale.set(0.85, 0.85, 1);
+      const pc = photoPositions[i];
+      sprite.position.set(Math.cos(pc.angle) * pc.r, pc.y, Math.sin(pc.angle) * pc.r);
+      sprite.userData = { index: i };
+      mainGroup.add(sprite);
+      photoSprites.push(sprite);
+      gsap.to(sprite.position, { y: sprite.position.y + 0.15, duration: 1.8 + i * 0.3, repeat: -1, yoyo: true, ease: "sine.inOut" });
+    });
+  }
+
+  renderer.domElement.addEventListener('pointerdown', (e) => {
+    mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    const hits = raycaster.intersectObjects(photoSprites);
+    if (hits.length > 0) openWishModal(hits[0].object.userData.index);
+  });
+
+  // 6. TRÁI TIM NỔI TỪ DƯỚI LÊN
+  function createHeartTexture(hexColor) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 64; canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = hexColor;
+    ctx.beginPath();
+    ctx.moveTo(32, 20);
+    ctx.bezierCurveTo(32, 14, 24, 6, 14, 6);
+    ctx.bezierCurveTo(2, 6, 2, 22, 2, 22);
+    ctx.bezierCurveTo(2, 36, 18, 48, 32, 58);
+    ctx.bezierCurveTo(46, 48, 62, 36, 62, 22);
+    ctx.bezierCurveTo(62, 22, 62, 6, 50, 6);
+    ctx.bezierCurveTo(40, 6, 32, 14, 32, 20);
+    ctx.fill();
+    return new THREE.CanvasTexture(canvas);
+  }
+
+  const floatingHeartsCount = 120;
+  const floatingGeo = new THREE.BufferGeometry();
+  const floatingPos = new Float32Array(floatingHeartsCount * 3);
+  const floatSpeed = [];
+  for (let i = 0; i < floatingHeartsCount; i++) {
+    floatingPos[i * 3] = (Math.random() - 0.5) * 16;
+    floatingPos[i * 3 + 1] = -5 + Math.random() * 10;
+    floatingPos[i * 3 + 2] = (Math.random() - 0.5) * 16;
+    floatSpeed.push(0.015 + Math.random() * 0.025);
+  }
+  floatingGeo.setAttribute('position', new THREE.BufferAttribute(floatingPos, 3));
+  const floatingMat = new THREE.PointsMaterial({
+    size: 0.2, map: createHeartTexture("#ff0066"), transparent: true,
+    blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.85
+  });
+  scene.add(new THREE.Points(floatingGeo, floatingMat));
+
+  function updateFloatingColor(hex) {
+    floatingMat.map = createHeartTexture(hex);
+    floatingMat.needsUpdate = true;
+  }
+  function updateContrast(val) {
+    heartMat.size = 0.045 * val;
+    galaxyMat.size = 0.035 * val;
+    floatingMat.opacity = Math.min(1.0, 0.5 * val);
+  }
+
+  // Gán ra global cho các oninput trong bảng điều khiển
+  window.updateHeartColor = updateHeartColor;
+  window.updateFloatingColor = updateFloatingColor;
+  window.updateContrast = updateContrast;
+
+  // 7. CHỮ 3D VÒNG QUANH
+  function createTextSprite(txt) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512; canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    ctx.font = "Bold 26px sans-serif";
+    ctx.fillStyle = "#ffffff";
+    ctx.shadowColor = "#ff0066";
+    ctx.shadowBlur = 12;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(txt, canvas.width / 2, canvas.height / 2);
+    const mat = new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvas), transparent: true, blending: THREE.AdditiveBlending });
+    const sprite = new THREE.Sprite(mat);
+    sprite.scale.set(2.2, 0.45, 1);
+    return sprite;
+  }
+  const labels = ["HAPPY BIRTHDAY", "HAPPY BIRTHDAY", "HAPPY BIRTHDAY", "HAPPY BIRTHDAY"];
+  labels.forEach((txt, idx, arr) => {
+    const sprite = createTextSprite(txt);
+    const angle = (idx / arr.length) * Math.PI * 2 + (Math.PI / 4);
+    sprite.position.set(Math.cos(angle) * 4.8, (Math.random() - 0.5) * 0.3, Math.sin(angle) * 4.8);
+    mainGroup.add(sprite);
+  });
+
+  // 8. ANIMATION LOOP
+  function animate() {
+    requestAnimationFrame(animate);
+    mainGroup.rotation.y += 0.0025;
+    const positions = floatingGeo.attributes.position.array;
+    for (let i = 0; i < floatingHeartsCount; i++) {
+      positions[i * 3 + 1] += floatSpeed[i];
+      if (positions[i * 3 + 1] > 6) {
+        positions[i * 3 + 1] = -5;
+        positions[i * 3] = (Math.random() - 0.5) * 16;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 16;
+      }
+    }
+    floatingGeo.attributes.position.needsUpdate = true;
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+}
+</script>
+</body>
+</html>
